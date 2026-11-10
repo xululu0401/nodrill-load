@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>免打孔承载装置对账台 · 背胶 / 吸盘 / 撑杆 / 磁吸到底能挂多重</title>
+<meta name="description" content="不能打孔的时候，背胶、真空吸盘、撑杆、磁铁到底能挂多重？几年后还够吗？把每种安装方式的多项约束同时摆开、取最小的那一项，算出实际安全系数、逐年衰减、瓶颈是哪一项，并反推「要挂住目标重量需要多大面积 / 多大吸盘 / 多粗的杆」。全部自己填，页面不联网。">
+<style>
+  :root{
+    --bg:#f5f6f8; --card:#fff; --ink:#161b22; --ink2:#4a5568; --ink3:#7b8794;
+    --line:#e3e6eb; --line2:#cbd2da; --brand:#0f5fa6; --brand2:#eaf2fa;
+    --good:#0f7b52; --goodbg:#e8f6ef; --warn:#9a5b00; --warnbg:#fff5e5; --bad:#b42318; --badbg:#fdeceb;
+    --radius:12px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font:15px/1.65 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+  .app{max-width:1340px;margin:0 auto;padding:22px 18px 60px;display:grid;grid-template-columns:430px minmax(0,1fr);gap:18px;align-items:start}
+  .app > *{min-width:0}
+  header.top{grid-column:1/-1;padding:4px 2px 0}
+  h1{margin:0 0 6px;font-size:26px;letter-spacing:.2px}
+  .lede{margin:0;color:var(--ink2);max-width:960px}
+  .badges{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
+  .badge{font-size:12px;padding:3px 9px;border-radius:999px;background:#fff;border:1px solid var(--line2);color:var(--ink2)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 16px 14px;margin:0 0 14px;box-shadow:0 1px 2px rgba(16,32,64,.04)}
+  .card h2{margin:0 0 12px;font-size:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .card h3{margin:16px 0 8px;font-size:14px;color:var(--ink2)}
+  .tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--brand2);color:var(--brand);border:1px solid #d3e3f5}
+  .tag.gray{background:#f1f3f6;color:var(--ink2);border-color:var(--line2)}
+  .field{margin-bottom:11px}
+  .field label{display:block;font-size:13px;color:var(--ink2);margin-bottom:4px}
+  .field label .sub{color:var(--ink3);font-size:12px}
+  input[type=text],select{width:100%;padding:8px 10px;border:1px solid var(--line2);border-radius:9px;font-size:14px;background:#fff;color:var(--ink);font-variant-numeric:tabular-nums}
+  input[type=text]:focus,select:focus{outline:2px solid #bcd8f0;border-color:var(--brand)}
+  input.bad,select.bad{border-color:var(--bad);background:var(--badbg)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .gridf{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px}
+  .gridf label{display:block;font-size:11.5px;color:var(--ink3);line-height:1.4}
+  .gridf input,.gridf select{width:100%;padding:6px 8px;font-size:13px}
+  button{font:inherit;font-size:13px;padding:8px 12px;border-radius:9px;border:1px solid var(--line2);background:#fff;color:var(--ink);cursor:pointer}
+  button:hover{background:#f7f9fb}
+  button.primary{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600}
+  button.primary:hover{background:#0d4f8a}
+  button.tiny{font-size:12px;padding:4px 8px}
+  .btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .btns > *{min-width:0}
+  .footnote{font-size:12px;color:var(--ink3);margin-top:8px;line-height:1.55}
+  table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+  th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+  th{color:var(--ink2);font-weight:600;background:#fafbfc;font-size:12px}
+  th:first-child,td:first-child{text-align:left;white-space:normal;word-break:keep-all}
+  tbody tr.pick{cursor:pointer}
+  tbody tr.pick:hover{background:#f7f9fb}
+  tbody tr.sel{background:var(--brand2)}
+  tbody tr.sel td{border-bottom-color:#bcd8f0}
+  tr.sum td{font-weight:700;background:#fafbfc}
+  .tw{overflow-x:auto;max-width:100%}
+  /* 总览表：判定与瓶颈放在首列，保证不横向滚动也能看到结论；
+     数字列用 nowrap + 定宽，超长数字由 .tw 容器横向滚动兜底 */
+  #ovTable{table-layout:fixed;min-width:724px}
+  #ovTable th,#ovTable td{padding:7px 6px}
+  #ovTable th:first-child,#ovTable td:first-child{width:170px;word-break:break-word;overflow-wrap:anywhere}
+  #ovTable th:nth-child(2),#ovTable td:nth-child(2){width:80px;white-space:normal;word-break:keep-all}
+  #ovTable th:nth-child(3),#ovTable td:nth-child(3),
+  #ovTable th:nth-child(4),#ovTable td:nth-child(4),
+  #ovTable th:nth-child(5),#ovTable td:nth-child(5),
+  #ovTable th:nth-child(6),#ovTable td:nth-child(6),
+  #ovTable th:nth-child(8),#ovTable td:nth-child(8){width:78px}
+  #ovTable th:nth-child(7),#ovTable td:nth-child(7){width:84px}
+  #sensTable{table-layout:fixed;min-width:720px}
+  #sensTable th,#sensTable td{padding:7px 6px}
+  #sensTable th:first-child,#sensTable td:first-child{width:190px;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
+  #sensTable th:nth-child(2),#sensTable td:nth-child(2),
+  #sensTable th:nth-child(3),#sensTable td:nth-child(3),
+  #sensTable th:nth-child(4),#sensTable td:nth-child(4),
+  #sensTable th:nth-child(5),#sensTable td:nth-child(5),
+  #sensTable th:nth-child(6),#sensTable td:nth-child(6){width:106px}
+  table.wrap th,table.wrap td{white-space:normal;word-break:keep-all}
+  table.wrap{table-layout:fixed}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+  .kpi{background:#fafbfc;border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
+  .kpi .k{font-size:12px;color:var(--ink2);margin-bottom:2px}
+  .kpi .v{font-size:19px;font-weight:700;letter-spacing:-.2px;word-break:keep-all}
+  .kpi .s{font-size:11px;color:var(--ink3);overflow-wrap:anywhere}
+  .concl{background:var(--brand2);border:1px solid #d3e3f5;border-radius:10px;padding:12px 14px;font-size:15px;line-height:1.7}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+  .pill.ok{background:var(--goodbg);color:var(--good)}
+  .pill.tight{background:var(--warnbg);color:var(--warn)}
+  .pill.fail{background:var(--badbg);color:var(--bad)}
+  .vd{color:var(--good)} .vt{color:var(--warn)} .vf{color:var(--bad)}
+  .bar{height:8px;border-radius:6px;background:#eef1f5;overflow:hidden;min-width:52px}
+  .bar > i{display:block;height:100%;border-radius:6px}
+  ul.tight{margin:4px 0 0;padding-left:20px}
+  ul.tight li{margin:5px 0;line-height:1.6}
+  ol.tight{margin:4px 0 0;padding-left:20px}
+  ol.tight li{margin:5px 0;line-height:1.6}
+  .item{border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:10px;background:#fcfdfe;min-width:0}
+  .itemhead{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+  .itemhead input.nm{flex:1 1 110px;min-width:0;font-weight:600}
+  .itemhead select{flex:0 1 132px;min-width:0;font-size:12.5px}
+  .itemhead .idx{font-size:12px;font-weight:700;color:var(--brand);background:var(--brand2);border:1px solid #d3e3f5;border-radius:8px;padding:2px 7px;white-space:nowrap}
+  .warnbox{background:var(--warnbg);border:1px solid #f2d9ad;border-radius:10px;padding:10px 12px;margin-top:10px;font-size:13px;color:#6b3f00}
+  .errbox{background:var(--badbg);border:1px solid #f3c6c2;border-radius:10px;padding:10px 12px;margin-top:10px;font-size:13px;color:#7a1a12}
+  .okbox{background:var(--goodbg);border:1px solid #bfe4d1;border-radius:10px;padding:10px 12px;margin-top:10px;font-size:13px;color:#0b5c3e}
+  .slices{display:grid;grid-template-columns:1fr;gap:8px}
+  .slice{font-size:12.8px;color:var(--ink2);border-left:3px solid var(--line2);padding-left:9px}
+  .slice b{color:var(--ink)}
+  .slice .st{display:block;font-weight:700;color:var(--ink);margin-bottom:2px}
+  .muted{color:var(--ink3)}
+  .sticky{position:sticky;top:14px;max-height:calc(100vh - 24px);overflow-y:auto}
+  .hidden{display:none !important}
+  .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));gap:8px}
+  .kv .row{background:#fafbfc;border:1px solid var(--line);border-radius:9px;padding:8px 10px;min-width:0}
+  .kv .row .k{font-size:11.5px;color:var(--ink2)}
+  .kv .row .v{font-size:14px;font-weight:600;word-break:break-word}
+  .scrollhint{display:none}
+  @media (max-width:1000px){
+    .app{grid-template-columns:minmax(0,1fr)}
+    .sticky{position:static;max-height:none;overflow:visible}
+    table{font-size:12.5px}
+    th,td{padding:6px 7px}
+    .scrollhint{display:inline}
+  }
+  @media (max-width:620px){
+    .app{padding:16px 12px 48px}
+    h1{font-size:22px}
+    .kpi .v{font-size:17px}
+    .gridf{grid-template-columns:repeat(auto-fit,minmax(104px,1fr))}
+  }
+  @media (max-width:400px){
+    .gridf{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .row2{grid-template-columns:minmax(0,1fr)}
+    .btns{gap:6px}
+    .btns button{font-size:12px;padding:7px 9px}
+    .itemhead select{flex:1 1 100%}
+    .kpi .v{font-size:16px}
+  }
+  input[type=file]{max-width:100%;min-width:0}
+  #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:26px;background:#161b22;color:#fff;padding:9px 16px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .18s;z-index:99;max-width:88vw;text-align:center}
+  @media print{
+    body{background:#fff}
+    .sticky{position:static;max-height:none;overflow:visible}
+    .app{grid-template-columns:minmax(0,1fr);max-width:none}
+    .no-print{display:none !important}
+    .card{break-inside:avoid;box-shadow:none}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <h1>免打孔承载装置对账台</h1>
+    <p class="lede">不能打孔的时候（租房、宿舍、瓷砖墙、办公室），东西只能靠<b>背胶、真空吸盘、撑杆、磁铁</b>固定。麻烦在于三件事只能靠猜：<b>这样装到底能挂多重</b>、<b>几年后还够不够</b>、<b>要挂住目标重量该改什么</b>。本页把每种安装方式的<b>多项约束同时摆开、取最小的那一项</b>，算出实际安全系数与逐年衰减，指出瓶颈是哪一项，并反推「需要多大粘贴面积 / 多大的吸盘 / 多粗的杆 —— 还是根本做不到、只能打孔」。</p>
+    <div class="badges">
+      <span class="badge">四种安装方式 · 多项约束取最小 · 逐年衰减</span>
+      <span class="badge">默认 6 件与 9 个场景全是虚构示例</span>
+      <span class="badge">不联网 · 不查产品参数 · 不做合格判定</span>
+    </div>
+  </header>
+
+  <div class="sticky">
+    <form id="form" onsubmit="return false">
+      <div class="card">
+        <h2>全局口径 <span class="tag">这两项对所有件都一样</span></h2>
+        <div class="row2">
+          <div class="field"><label>目标安全系数 <span class="sub">能力要留几倍</span></label><input type="text" id="sf"></div>
+          <div class="field"><label>观察年限（年）</label><input type="text" id="years"></div>
+        </div>
+        <p class="footnote">「实际安全系数」= T 年末的能力 ÷（目标载荷 × 动载系数）；「许可载荷」= 能力 ÷（安全系数 × 动载系数）。安全系数是<b>你自己定的留几倍</b>，不是任何标准里的规定值。</p>
+      </div>
+
+      <div class="card">
+        <h2>装置清单 <span class="tag gray" id="itemCount"></span></h2>
+        <div id="items"></div>
+        <div class="btns">
+          <button type="button" class="tiny" id="btnAdd">+ 加一件</button>
+          <button type="button" class="tiny" id="btnDel">− 删最后一件</button>
+        </div>
+        <p class="footnote">每件都有<b>自己的安装方式、受力方向与假设</b>；最多 6 件。力的单位统一用牛（N），页面同步显示 kgf 供对照（1 kgf = 9.80665 N）。</p>
+      </div>
+
+      <div class="card">
+        <h2>场景</h2>
+        <div class="field"><label>一键换上（会覆盖当前输入）</label><select id="scenario"></select></div>
+        <p class="footnote">场景只改数字。默认样例、9 个内置场景与页面上所有数字<b>都是虚构示例</b>，不是任何真实产品、品牌或事件的实测数据。</p>
+      </div>
+
+      <div class="card no-print">
+        <h2>保存与导出</h2>
+        <div class="btns">
+          <button type="button" class="primary" id="btnSave">保存到本机</button>
+          <button type="button" id="btnLoad">读取本机</button>
+          <button type="button" id="btnReset">恢复默认示例</button>
+        </div>
+        <div class="btns">
+          <button type="button" id="btnCsv">导出 CSV</button>
+          <button type="button" id="btnMd">导出 Markdown</button>
+          <button type="button" id="btnJson">导出 JSON 备份</button>
+          <button type="button" id="btnPng">导出结果卡 PNG</button>
+        </div>
+        <div class="btns">
+          <label style="font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:6px">导入备份<input type="file" id="importFile" accept=".json,application/json"></label>
+          <button type="button" id="btnPrint">打印视图</button>
+        </div>
+        <p class="footnote" id="saveState">改动会即时重算；「保存到本机」用的是浏览器本地存储（只在这台机器上）。</p>
+      </div>
+    </form>
+  </div>
+
+  <main>
+    <div class="card">
+      <h2>结论 <span class="tag gray" id="verdictTag"></span></h2>
+      <div id="errors"></div>
+      <div class="concl" id="headline"></div>
+      <div class="kpis" id="kpis" style="margin-top:12px"></div>
+      <div id="warnBox"></div>
+    </div>
+
+    <div class="card">
+      <h2>全件总览 <span class="tag gray">点任意一行看这一件的明细</span></h2>
+      <div class="tw">
+        <table id="ovTable">
+          <thead><tr>
+            <th>件 · 判定 · 瓶颈</th><th>方式·方向</th><th>目标载荷</th><th>有效载荷</th>
+            <th>初始能力</th><th>T 年末</th><th>安全系数</th><th>许可载荷</th>
+          </tr></thead>
+          <tbody id="ovBody"></tbody>
+        </table>
+      </div>
+      <p class="footnote">这一栏是<b>同一次 analyze() 的结果</b>。「有效载荷」= 目标载荷 × 动载系数；「瓶颈」是这一件所有约束里最小的那一项（判定与瓶颈都放在首列，不用横向滚动就能看到；表中 ≥ 1000 N 的数字按整数显示，完整小数见下面的明细、逐年表与导出）。 <span class="scrollhint">窄屏下这张表可以左右滑动看完整列。</span></p>
+    </div>
+
+    <div class="card">
+      <h2>选中件详解 <span class="tag" id="selName"></span></h2>
+      <h3>全部约束项（能力取最小的那一项）</h3>
+      <div id="binding"></div>
+      <h3>逐年衰减</h3>
+      <div class="tw">
+        <table id="yearTable">
+          <thead><tr><th>年份</th><th>能力</th><th>实际安全系数</th><th>许可载荷</th><th>判定</th></tr></thead>
+          <tbody id="yearBody"></tbody>
+        </table>
+      </div>
+      <p class="footnote" id="yearNote"></p>
+      <h3>反推：要在 T 年末仍达标，需要改什么</h3>
+      <div id="revBody"></div>
+    </div>
+
+    <div class="card">
+      <h2>值得记住的几条 <span class="tag gray">都能在下面的表和约束里复核</span></h2>
+      <div class="slices" id="insights"></div>
+    </div>
+
+    <div class="card">
+      <h2>敏感性 <span class="tag gray" id="sensOf"></span></h2>
+      <div class="tw"><table id="sensTable">
+        <thead><tr><th>改动</th><th>T 年末能力</th><th>实际安全系数</th><th>许可载荷</th><th>判定</th><th>安全系数变化</th></tr></thead>
+        <tbody id="sensBody"></tbody>
+      </table></div>
+      <p class="footnote">每一行都是<b>完整重算</b>过的，不是按比例估算。 <span class="scrollhint">窄屏下这张表可以左右滑动看完整列。</span></p>
+    </div>
+
+    <div class="card">
+      <h2>下一步</h2>
+      <ol class="tight" id="steps"></ol>
+    </div>
+
+    <div class="card">
+      <h2>这份账不算什么</h2>
+      <ul class="tight" id="limits"></ul>
+    </div>
+
+    <div class="card">
+      <h2>结构自检 <span class="tag gray" id="checkTag"></span></h2>
+      <ul class="tight" id="checks"></ul>
+      <p class="footnote">这些是每次重算都会跑的一致性与恒等式检查：实际安全系数 = 能力 ÷ 有效载荷、许可载荷 = 能力 ÷（安全系数 × 动载系数）、T 年末能力 = 初始能力 × (1−衰减)^T、初始能力 = 该方式约束项取最小、能力随年份单调不增、判定档与门限一致、反推取整后的解回代仍达标、结果里没有 NaN。它们是<b>本页内部一致性</b>的证据，不等于这些假设对现实成立。</p>
+    </div>
+  </main>
+</div>
+<div id="toast"></div>
+<script>/*CORE*/</script>
+<script>/*UI*/</script>
+</body>
+</html>
